@@ -1,0 +1,25 @@
+.screen {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 16px;
+  min-height: 100vh;
+  padding: 24px;
+  color: var(--color-muted);
+  text-align: center;
+}
+
+.dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent-teal);
+  animation: pulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes pulse {
+  to {
+    transform: scale(1.6);
+    opacity: 0.4;
+  }
+}

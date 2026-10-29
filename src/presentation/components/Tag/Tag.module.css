@@ -1,0 +1,36 @@
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-size: var(--text-xs);
+  font-weight: 400;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.neutral {
+  background: #f1f1f1;
+  color: var(--color-ink);
+}
+
+.outline {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-ink);
+}
+
+.accent {
+  background: #e7f6f4;
+  color: #237a72;
+  font-weight: 600;
+}
+
+.accent::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-teal);
+}

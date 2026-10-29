@@ -1,0 +1,53 @@
+.window {
+  position: relative;
+  display: inline-grid;
+  isolation: isolate;
+  vertical-align: bottom;
+  padding-bottom: 0.08em;
+  font-weight: 700;
+  color: var(--color-ink);
+  transition: width var(--duration-slow) var(--ease-smooth);
+}
+
+/* marca-texto que acompanha a largura da palavra */
+.window::after {
+  content: '';
+  position: absolute;
+  left: -0.08em;
+  right: -0.08em;
+  bottom: 0.12em;
+  height: 0.36em;
+  z-index: -1;
+  border-radius: 4px;
+  background: var(--accent-yellow);
+}
+
+.word {
+  grid-area: 1 / 1;
+  justify-self: start; /* mede a largura real da palavra, não a da coluna */
+  white-space: nowrap;
+  transition:
+    opacity var(--duration-slow) var(--ease-smooth),
+    transform var(--duration-slow) var(--ease-smooth),
+    filter var(--duration-slow) var(--ease-smooth);
+}
+
+.word[data-state='active'] {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+/* a palavra que sai sobe e desfoca... */
+.word[data-state='exiting'] {
+  opacity: 0;
+  transform: translateY(-0.45em);
+  filter: blur(6px);
+}
+
+/* ...e as próximas esperam embaixo, invisíveis */
+.word[data-state='waiting'] {
+  opacity: 0;
+  transform: translateY(0.45em);
+  filter: blur(6px);
+}

@@ -1,0 +1,43 @@
+.marquee {
+  overflow: hidden;
+  background: var(--color-header);
+  color: #fff;
+}
+
+.rail {
+  display: flex;
+  width: max-content;
+  animation: scroll 75s linear infinite;
+}
+
+.marquee:hover .rail {
+  animation-play-state: paused;
+}
+
+.track {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding: 18px 0 18px 28px;
+  font-size: var(--text-lg);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.item::after {
+  content: '✦';
+  font-size: 0.75em;
+  color: var(--accent-yellow);
+}
+
+@keyframes scroll {
+  to {
+    transform: translateX(-50%);
+  }
+}

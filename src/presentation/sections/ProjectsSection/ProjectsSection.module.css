@@ -1,0 +1,191 @@
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+
+/* ---------- Card (igual ao "latest work" da referência) ---------- */
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  transition:
+    box-shadow 0.35s ease,
+    transform 0.35s var(--ease-out);
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.cardBody {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 20px 22px 18px;
+}
+
+.cardTitle {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--color-ink);
+}
+
+/* torna o card inteiro clicável sem aninhar links */
+.stretchedLink::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.category {
+  margin-top: 2px;
+  font-size: var(--text-xs);
+  color: var(--color-subtle);
+}
+
+.description {
+  margin-top: 12px;
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  color: var(--color-muted);
+}
+
+.cardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 18px;
+  font-size: var(--text-xs);
+}
+
+.repoHint {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-muted);
+}
+
+.liveLink {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--color-header);
+  color: #fff;
+  font-weight: 600;
+  transition: background-color 0.25s ease;
+}
+
+.liveLink:hover {
+  background: #333;
+}
+
+/* ---------- Outros projetos ---------- */
+
+.others {
+  margin-top: 64px;
+}
+
+.othersTitle {
+  margin-bottom: 8px;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-subtle);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr) auto 24px;
+  align-items: center;
+  gap: 24px;
+  padding: 20px 4px;
+  border-bottom: 1px solid var(--color-border);
+  transition: padding 0.3s var(--ease-out);
+}
+
+.row:hover {
+  padding-inline: 14px 0;
+}
+
+.rowName {
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.rowDescription {
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+}
+
+.rowStack {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.rowArrow {
+  color: var(--color-subtle);
+  transition:
+    transform 0.3s var(--ease-out),
+    color 0.3s ease;
+}
+
+.row:hover .rowArrow {
+  color: var(--color-ink);
+  transform: translateX(4px);
+}
+
+.more {
+  display: flex;
+  justify-content: center;
+  margin-top: 48px;
+}
+
+@media (max-width: 960px) {
+  .cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .row {
+    grid-template-columns: minmax(0, 1fr) 24px;
+    gap: 6px 16px;
+  }
+
+  .rowDescription,
+  .rowStack {
+    grid-column: 1;
+  }
+
+  .rowStack {
+    justify-content: flex-start;
+  }
+
+  .rowArrow {
+    grid-column: 2;
+    grid-row: 1;
+  }
+}
+
+@media (max-width: 620px) {
+  .cards {
+    grid-template-columns: 1fr;
+  }
+}

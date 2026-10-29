@@ -1,0 +1,70 @@
+.footer {
+  position: relative;
+  background: var(--color-surface-footer);
+  color: var(--color-muted);
+  font-size: var(--text-sm);
+}
+
+/* meia-lua "voltar ao topo", como na referência */
+.backToTop {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  display: grid;
+  place-items: start center;
+  width: 108px;
+  height: 54px;
+  padding-top: 10px;
+  border-radius: 108px 108px 0 0;
+  background: var(--color-surface-footer);
+  color: var(--color-subtle);
+  transform: translate(-50%, -100%);
+  transition: color 0.25s ease;
+}
+
+.backToTop:hover {
+  color: var(--color-ink);
+}
+
+.backToTop svg {
+  transition: transform 0.3s var(--ease-out);
+}
+
+.backToTop:hover svg {
+  transform: translateY(-3px);
+}
+
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-block: 30px;
+}
+
+.copyright:hover,
+.links a:hover {
+  color: var(--color-ink);
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+}
+
+.links a {
+  transition: color 0.2s ease;
+}
+
+@media (max-width: 620px) {
+  .bar {
+    flex-direction: column-reverse;
+    padding-block: 36px 28px;
+  }
+
+  .links {
+    justify-content: center;
+  }
+}

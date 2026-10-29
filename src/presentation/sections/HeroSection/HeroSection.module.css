@@ -1,0 +1,114 @@
+.hero {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-surface);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  align-items: center;
+  gap: clamp(40px, 6vw, 96px);
+  min-height: clamp(560px, calc(100vh - var(--header-height) - 64px), 760px);
+  padding-block: clamp(48px, 6vw, 80px);
+}
+
+/* ---------- Texto ---------- */
+
+.name {
+  display: flex;
+  flex-direction: column;
+  font-size: clamp(3.5rem, 9vw, 8.25rem);
+  font-weight: 800;
+  line-height: 0.9;
+  letter-spacing: -0.06em;
+  color: var(--color-ink);
+}
+
+.outlined {
+  letter-spacing: -0.02em;
+  color: transparent;
+  -webkit-text-stroke: 2px var(--color-ink);
+}
+
+.roleLine {
+  margin-top: clamp(24px, 3vw, 36px);
+  font-size: clamp(1.75rem, 3.2vw, 2.75rem);
+  font-weight: 300;
+  letter-spacing: -0.035em;
+  color: var(--color-muted);
+}
+
+.tagline {
+  margin-top: 18px;
+  max-width: 36ch;
+  font-size: var(--text-lg);
+  line-height: 1.5;
+  color: var(--color-muted);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 40px;
+}
+
+.photo {
+  animation: rise 1.6s var(--ease-out) 0.45s backwards;
+}
+
+/* ---------- Entrada escalonada ---------- */
+
+.reveal {
+  animation: rise 1.3s var(--ease-out) backwards;
+}
+
+.name .reveal:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.name .reveal:nth-child(2) {
+  animation-delay: 0.25s;
+}
+
+.roleLine.reveal {
+  animation-delay: 0.45s;
+}
+
+.tagline.reveal {
+  animation-delay: 0.6s;
+}
+
+.actions.reveal {
+  animation-delay: 0.75s;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+    filter: blur(8px);
+  }
+}
+
+/* ---------- Responsivo ---------- */
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 48px;
+    min-height: 0;
+    padding-block: 56px 72px;
+  }
+}
+
+@media (max-width: 560px) {
+  .outlined {
+    -webkit-text-stroke-width: 1.5px;
+  }
+
+  .tagline {
+    font-size: var(--text-base);
+  }
+}

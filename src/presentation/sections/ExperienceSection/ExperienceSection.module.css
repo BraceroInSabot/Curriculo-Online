@@ -1,0 +1,155 @@
+.timeline {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  --dot-size: 13px;
+  position: relative;
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap: 48px;
+  padding-bottom: 52px;
+}
+
+.item:last-child {
+  padding-bottom: 0;
+}
+
+/* linha vertical */
+.item::before {
+  content: '';
+  position: absolute;
+  left: 224px;
+  top: 10px;
+  bottom: -10px;
+  width: 1px;
+  background: var(--color-border);
+}
+
+.item:last-child::before {
+  display: none;
+}
+
+/* marcador */
+.item::after {
+  content: '';
+  position: absolute;
+  left: calc(224px - var(--dot-size) / 2 + 0.5px);
+  top: 6px;
+  width: var(--dot-size);
+  height: var(--dot-size);
+  border-radius: 50%;
+  background: var(--color-surface);
+  border: 2px solid #cfcfcf;
+}
+
+.current::after {
+  border-color: var(--accent-teal);
+  background: var(--accent-teal);
+  box-shadow: 0 0 0 5px rgba(95, 189, 181, 0.18);
+}
+
+.when {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: right;
+  padding-top: 2px;
+}
+
+.period {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-ink);
+}
+
+.duration {
+  font-size: var(--text-xs);
+  color: var(--color-subtle);
+}
+
+.body {
+  padding-left: 8px;
+}
+
+.roleLine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.role {
+  font-size: var(--text-xl);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  color: var(--color-ink);
+}
+
+.organization {
+  margin-top: 6px;
+  font-weight: 400;
+  color: var(--color-ink);
+}
+
+.summary {
+  margin-top: 12px;
+  max-width: 62ch;
+  color: var(--color-muted);
+  line-height: 1.65;
+}
+
+.highlights {
+  display: grid;
+  gap: 6px;
+  margin-top: 14px;
+  color: var(--color-muted);
+}
+
+.highlights li {
+  position: relative;
+  padding-left: 18px;
+}
+
+.highlights li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--color-subtle);
+}
+
+@media (max-width: 760px) {
+  .item {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding-left: 32px;
+    padding-bottom: 40px;
+  }
+
+  .item::before {
+    left: 6px;
+  }
+
+  .item::after {
+    left: 0;
+    top: 4px;
+  }
+
+  .when {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+    text-align: left;
+  }
+
+  .body {
+    padding-left: 0;
+  }
+
+  .role {
+    font-size: var(--text-lg);
+  }
+}
