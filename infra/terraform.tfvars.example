@@ -1,0 +1,11 @@
+# Copie para terraform.tfvars (que NÃO vai para o Git) e ajuste.
+#   cp terraform.tfvars.example terraform.tfvars
+#
+# A imagem não fica aqui: ela é passada a cada deploy pelo script
+# /usr/local/bin/curriculo-deploy (veja docs/PRODUCAO.md).
+
+domains    = ["bracero.com.br", "www.bracero.com.br"]
+acme_email = "seu-email@exemplo.com"
+
+# Primeiro teste? Use o staging do Let's Encrypt e depois troque para produção:
+# acme_server = "https://acme-staging-v02.api.letsencrypt.org/directory"

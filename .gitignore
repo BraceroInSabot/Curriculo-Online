@@ -5,3 +5,12 @@ coverage
 .DS_Store
 .vscode/*
 !.vscode/extensions.json
+docs
+
+# Terraform (estado e variáveis ficam só no servidor)
+infra/.terraform/
+infra/*.tfstate
+infra/*.tfstate.*
+infra/terraform.tfvars
+# gerado no servidor no `terraform init`; a versão é limitada em versions.tf
+infra/.terraform.lock.hcl

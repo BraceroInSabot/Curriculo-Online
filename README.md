@@ -86,3 +86,5 @@ O pipeline do GitHub Actions testa, valida e publica a imagem no GHCR a cada pus
 `master`. Para testar a imagem localmente: `docker compose up --build` → http://localhost:8080.
 
 Detalhes, passo a passo e requisitos do pod: [docs/DEPLOY.md](docs/DEPLOY.md).
+Para subir o servidor (VPS + k3s + Terraform) e ligar o deploy automático:
+[docs/PRODUCAO.md](docs/PRODUCAO.md).

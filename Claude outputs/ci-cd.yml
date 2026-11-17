@@ -6,8 +6,8 @@
 #                   (tags `sha-<commit>` e `latest`).
 #   Tag v1.2.3    → CI + CD: publica também `1.2.3` e `1.2`.
 #
-# A etapa de deploy no Kubernetes entra depois que o cluster existir
-# (veja docs/DEPLOY.md, seção "Ligando o deploy").
+#   Depois da publicação na master → deploy no VPS (k3s), se a variável de
+#   repositório DEPLOY_ENABLED for "true". Configuração: docs/PRODUCAO.md.
 #
 # Segurança: as actions de terceiros estão fixadas por SHA do commit (o comentário
 # mostra a versão). Uma tag pode ser movida para código malicioso — foi o que
@@ -133,7 +133,7 @@ jobs:
             -p 8080:8080 "$LOCAL_IMAGE"
 
           echo "Aguardando /healthz…"
-          for i in $(seq 1 20); do
+          for _ in $(seq 1 20); do
             curl -fsS http://localhost:8080/healthz && break
             sleep 1
           done
@@ -207,3 +207,67 @@ jobs:
             echo "${{ steps.meta.outputs.tags }}"
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+
+  # ---------------------------------------------------------------------------
+  # CD — deploy no servidor (k3s no VPS)
+  # ---------------------------------------------------------------------------
+  # O GitHub não acessa o cluster diretamente (a API do Kubernetes não fica
+  # exposta na internet). Ele entra por SSH com uma chave que só pode executar
+  # /usr/local/bin/curriculo-deploy, passando o digest da imagem recém-publicada.
+  deploy:
+    name: Deploy (produção)
+    needs: imagem
+    if: >-
+      github.event_name != 'pull_request' &&
+      github.ref == 'refs/heads/master' &&
+      vars.DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # Settings → Environments → producao: segredos do servidor e, se quiser,
+    # aprovação manual antes de cada deploy.
+    environment:
+      name: producao
+      url: ${{ vars.SITE_URL }}
+    # Deploys em fila, nunca em paralelo nem cancelados no meio.
+    concurrency:
+      group: deploy-producao
+      cancel-in-progress: false
+    permissions: {}
+    steps:
+      - name: Preparar SSH
+        env:
+          SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          # known_hosts fixo: garante que o pipeline fala com o SEU servidor
+          # (protege contra alguém se passando por ele).
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+
+      - name: Deploy via SSH
+        env:
+          HOST: ${{ secrets.DEPLOY_HOST }}
+          PORT: ${{ vars.DEPLOY_SSH_PORT || '22' }}
+          DIGEST: ${{ needs.imagem.outputs.digest }}
+        run: |
+          test -n "$DIGEST" || { echo "Digest da imagem vazio"; exit 1; }
+          ssh -i ~/.ssh/deploy_key -p "$PORT" \
+            -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=20 \
+            "deploy@${HOST}" "deploy ${DIGEST}"
+
+      - name: Verificar o site
+        if: vars.SITE_URL != ''
+        env:
+          SITE_URL: ${{ vars.SITE_URL }}
+        run: |
+          for _ in $(seq 1 10); do
+            curl -fsS -o /dev/null "$SITE_URL/healthz" && { echo "Site no ar: $SITE_URL"; exit 0; }
+            sleep 3
+          done
+          echo "O site não respondeu em $SITE_URL/healthz"; exit 1
+
+      - name: Limpar chave
+        if: always()
+        run: rm -f ~/.ssh/deploy_key

@@ -28,3 +28,7 @@ compose.yaml
 docs
 README.md
 CLAUDE.md
+
+# Infraestrutura e deploy (rodam no servidor, não na imagem)
+infra
+deploy

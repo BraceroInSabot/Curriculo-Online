@@ -1,0 +1,17 @@
+# Ajuste do Traefik que vem com o k3s: todo acesso HTTP (porta 80) é
+# redirecionado para HTTPS (porta 443).
+#
+# Instalação (uma vez, no servidor):
+#   sudo cp deploy/k3s/traefik-config.yaml /var/lib/rancher/k3s/server/manifests/
+# O k3s aplica sozinho qualquer arquivo colocado nessa pasta.
+apiVersion: helm.cattle.io/v1
+kind: HelmChartConfig
+metadata:
+  name: traefik
+  namespace: kube-system
+spec:
+  valuesContent: |-
+    additionalArguments:
+      - "--entryPoints.web.http.redirections.entryPoint.to=websecure"
+      - "--entryPoints.web.http.redirections.entryPoint.scheme=https"
+      - "--entryPoints.web.http.redirections.entryPoint.permanent=true"
