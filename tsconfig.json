@@ -16,13 +16,12 @@
     "skipLibCheck": true,
     "noEmit": true,
     "types": ["vite/client", "node"],
-    "baseUrl": ".",
     "paths": {
-      "@domain/*": ["src/domain/*"],
-      "@application/*": ["src/application/*"],
-      "@infrastructure/*": ["src/infrastructure/*"],
-      "@presentation/*": ["src/presentation/*"],
-      "@main/*": ["src/main/*"]
+      "@domain/*": ["./src/domain/*"],
+      "@application/*": ["./src/application/*"],
+      "@infrastructure/*": ["./src/infrastructure/*"],
+      "@presentation/*": ["./src/presentation/*"],
+      "@main/*": ["./src/main/*"]
     }
   },
   "include": ["src", "tests", "vite.config.ts"]
