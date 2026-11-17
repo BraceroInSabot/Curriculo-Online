@@ -1,0 +1,41 @@
+# Abre PRs semanais atualizando dependências. Cada PR passa pelo pipeline
+# (testes + smoke test + scan) antes de você decidir fazer o merge.
+version: 2
+updates:
+  # Pacotes npm (React, Vite, TypeScript…)
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      timezone: America/Sao_Paulo
+    open-pull-requests-limit: 5
+    groups:
+      # minor/patch juntos num PR só; major vem separado (pode quebrar).
+      npm-minor-patch:
+        update-types: [minor, patch]
+    commit-message:
+      prefix: "chore(deps)"
+
+  # Actions usadas no pipeline (atualiza o SHA fixado e o comentário de versão)
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      timezone: America/Sao_Paulo
+    groups:
+      actions:
+        patterns: ["*"]
+    commit-message:
+      prefix: "chore(ci)"
+
+  # Imagens base do Dockerfile (node, nginx-unprivileged)
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      timezone: America/Sao_Paulo
+    commit-message:
+      prefix: "chore(docker)"

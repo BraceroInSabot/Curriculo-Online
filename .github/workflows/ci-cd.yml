@@ -1,0 +1,205 @@
+# Pipeline do Currículo Online
+#
+#   Pull request  → CI: tipos, testes e build + build da imagem, smoke test e scan.
+#                   Nada é publicado.
+#   Push master   → CI + CD: tudo acima e publica a imagem no GHCR
+#                   (tags `sha-<commit>` e `latest`).
+#   Tag v1.2.3    → CI + CD: publica também `1.2.3` e `1.2`.
+#
+# A etapa de deploy no Kubernetes entra depois que o cluster existir
+# (veja docs/DEPLOY.md, seção "Ligando o deploy").
+#
+# Segurança: as actions de terceiros estão fixadas por SHA do commit (o comentário
+# mostra a versão). Uma tag pode ser movida para código malicioso — foi o que
+# aconteceu com a trivy-action em março/2026; um SHA não pode. O Dependabot
+# (.github/dependabot.yml) abre PRs atualizando SHA e comentário juntos.
+
+name: CI/CD
+
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+    tags: ["v*.*.*"]
+  workflow_dispatch:
+
+# Em PRs, um push novo cancela a execução anterior. Na master, nunca cancela
+# (para não interromper uma publicação no meio).
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+# Menor privilégio por padrão; cada job pede só o que precisa.
+permissions:
+  contents: read
+
+env:
+  REGISTRY: ghcr.io
+  LOCAL_IMAGE: curriculo-online:ci
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # CI 1/2 — qualidade do código
+  # ---------------------------------------------------------------------------
+  qualidade:
+    name: Qualidade (tipos, testes, build)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Node.js (versão do .nvmrc)
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci --no-audit --no-fund
+
+      - name: Checagem de tipos
+        run: npm run typecheck
+
+      - name: Testes
+        run: npm test
+
+      - name: Build de produção
+        run: npm run build
+
+  # ---------------------------------------------------------------------------
+  # CI 2/2 + CD — imagem Docker
+  # ---------------------------------------------------------------------------
+  imagem:
+    name: Imagem (build, smoke test, scan, publicação)
+    needs: qualidade
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: read
+      packages: write # publicar no GitHub Container Registry
+    outputs:
+      digest: ${{ steps.publicar.outputs.digest }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: QEMU (build para arm64)
+        uses: docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1 # v4.4.0
+
+      - name: Docker Buildx
+        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+
+      # Gera nomes de tag e labels OCI a partir do evento (branch, tag, commit).
+      - name: Metadados da imagem
+        id: meta
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository }}
+          tags: |
+            type=sha,format=short,prefix=sha-
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+          labels: |
+            org.opencontainers.image.title=curriculo-online
+            org.opencontainers.image.description=Currículo online de Guilherme Bracero
+
+      # 1) Build só para amd64, carregado no Docker local para ser testado.
+      - name: Build da imagem (teste)
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          platforms: linux/amd64
+          load: true
+          push: false
+          tags: ${{ env.LOCAL_IMAGE }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # 2) Sobe o container com as mesmas restrições do pod e testa de verdade.
+      - name: Smoke test (simulando o pod)
+        run: |
+          docker run -d --name web \
+            --read-only --tmpfs /tmp \
+            --cap-drop ALL --security-opt no-new-privileges \
+            -p 8080:8080 "$LOCAL_IMAGE"
+
+          echo "Aguardando /healthz…"
+          for i in $(seq 1 20); do
+            curl -fsS http://localhost:8080/healthz && break
+            sleep 1
+          done
+
+          echo "Página inicial responde com o app"
+          curl -fsS http://localhost:8080/ | grep -q '<div id="root">'
+
+          echo "Cabeçalhos de segurança presentes"
+          curl -fsSI http://localhost:8080/ | grep -qi '^content-security-policy:'
+
+          echo "Caminho inexistente devolve 404"
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/nao-existe)" = "404"
+
+          echo "Processo roda como UID 101 (sem root)"
+          test "$(docker exec web id -u)" = "101"
+
+      - name: Logs do container (se falhar)
+        if: failure()
+        run: docker logs web || true
+
+      # 3) Bloqueia a publicação se houver vulnerabilidade ALTA/CRÍTICA com correção.
+      - name: Scan de vulnerabilidades (Trivy)
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: ${{ env.LOCAL_IMAGE }}
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: "1"
+          format: table
+
+      # 4) CD: publica (só fora de PR). Multi-arquitetura: roda em nós x86 e ARM.
+      - name: Login no GHCR
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build e push (amd64 + arm64)
+        id: publicar
+        if: github.event_name != 'pull_request'
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          provenance: mode=max # atestado de como a imagem foi construída
+          sbom: true           # lista de pacotes da imagem
+
+      - name: Resumo
+        if: github.event_name != 'pull_request'
+        run: |
+          {
+            echo "### Imagem publicada"
+            echo
+            echo "Use o **digest** no deploy (imutável):"
+            echo
+            echo '```'
+            echo "${REGISTRY}/${GITHUB_REPOSITORY,,}@${{ steps.publicar.outputs.digest }}"
+            echo '```'
+            echo
+            echo "Tags:"
+            echo '```'
+            echo "${{ steps.meta.outputs.tags }}"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
