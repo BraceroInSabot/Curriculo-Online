@@ -14,7 +14,7 @@
 ############################
 # --platform=$BUILDPLATFORM: o build do site roda na arquitetura da máquina de CI
 # (rápido, sem emulação). O resultado é HTML/CSS/JS, igual para amd64 e arm64.
-FROM --platform=$BUILDPLATFORM node:22-alpine AS build
+FROM --platform=$BUILDPLATFORM node:26-alpine AS build
 
 WORKDIR /app
 
