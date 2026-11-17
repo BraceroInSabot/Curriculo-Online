@@ -79,5 +79,10 @@ remoto) é só criar outra classe que implemente `ResumeRepository` e trocá-la 
 
 ## Deploy
 
-`npm run build` gera arquivos estáticos em `dist/` (com caminhos relativos), prontos
-para GitHub Pages, Vercel ou Netlify.
+`npm run build` gera arquivos estáticos em `dist/` (com caminhos relativos).
+
+Em produção o site roda como container (nginx sem root, porta 8080) num pod Kubernetes.
+O pipeline do GitHub Actions testa, valida e publica a imagem no GHCR a cada push na
+`master`. Para testar a imagem localmente: `docker compose up --build` → http://localhost:8080.
+
+Detalhes, passo a passo e requisitos do pod: [docs/DEPLOY.md](docs/DEPLOY.md).

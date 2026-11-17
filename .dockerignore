@@ -1,0 +1,30 @@
+# Tudo que NÃO deve ir para o contexto do build da imagem.
+# Menos arquivos = build mais rápido e nada sensível vazando para a imagem.
+
+# Dependências e saídas locais (o build do container gera as próprias)
+node_modules
+dist
+coverage
+*.log
+*.tsbuildinfo
+
+# Controle de versão, CI e editores
+.git
+.gitignore
+.gitattributes
+.github
+.vscode
+.idea
+.DS_Store
+
+# Arquivos de ambiente/segredos
+.env
+.env.*
+
+# Arquivos de container e docs (não fazem parte do site)
+Dockerfile
+.dockerignore
+compose.yaml
+docs
+README.md
+CLAUDE.md

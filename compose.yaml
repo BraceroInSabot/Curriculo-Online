@@ -1,0 +1,22 @@
+# Roda a imagem de produção localmente, com as MESMAS restrições do pod:
+#   docker compose up --build      → http://localhost:8080
+#
+# Se funcionar aqui, funciona no Kubernetes com o securityContext do docs/DEPLOY.md.
+services:
+  web:
+    build: .
+    image: curriculo-online:local
+    ports:
+      - "8080:8080"
+    read_only: true           # = readOnlyRootFilesystem: true
+    tmpfs:
+      - /tmp                  # = volume emptyDir montado em /tmp
+    cap_drop:
+      - ALL                   # = capabilities.drop: ["ALL"]
+    security_opt:
+      - no-new-privileges:true  # = allowPrivilegeEscalation: false
+    healthcheck:              # = readinessProbe/livenessProbe em /healthz
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/healthz"]
+      interval: 10s
+      timeout: 2s
+      retries: 3

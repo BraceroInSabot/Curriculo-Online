@@ -6,6 +6,7 @@ React 18 + TypeScript + Vite, organizado em Clean Architecture (veja README.md).
 - `npm run dev` — servidor de desenvolvimento
 - `npm test` — testes (Vitest, em `tests/`)
 - `npm run build` — `tsc --noEmit` + build de produção
+- `docker compose up --build` — roda a imagem de produção em http://localhost:8080 (veja docs/DEPLOY.md)
 
 ## Convenções
 - Conteúdo do currículo: só em `src/infrastructure/data/resumeData.ts`.
