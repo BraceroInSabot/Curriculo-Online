@@ -32,7 +32,15 @@ RUN npm run build
 ############################
 # nginx oficial, variante "unprivileged": roda como UID 101 e escuta na 8080
 # (portas < 1024 exigiriam root ou a capability NET_BIND_SERVICE).
-FROM nginxinc/nginx-unprivileged:1.31-alpine AS runtime
+# Variante "slim": só o nginx, sem curl, sem módulos extras (xslt, geoip, njs,
+# image-filter) e sem as bibliotecas que eles puxam. Menos pacotes = menos CVEs.
+FROM nginxinc/nginx-unprivileged:1.31-alpine-slim AS runtime
+
+# A imagem base é reconstruída de tempos em tempos; entre uma e outra, o Alpine
+# publica correções de segurança. `apk upgrade` aplica essas correções no build.
+# (O pipeline nunca reaproveita este estágio do cache — veja `no-cache-filters`.)
+USER 0
+RUN apk upgrade --no-cache
 
 # Configuração própria (substitui a padrão da imagem).
 COPY docker/nginx/nginx.conf /etc/nginx/nginx.conf
