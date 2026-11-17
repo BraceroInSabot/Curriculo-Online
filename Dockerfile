@@ -32,7 +32,7 @@ RUN npm run build
 ############################
 # nginx oficial, variante "unprivileged": roda como UID 101 e escuta na 8080
 # (portas < 1024 exigiriam root ou a capability NET_BIND_SERVICE).
-FROM nginxinc/nginx-unprivileged:1.30-alpine AS runtime
+FROM nginxinc/nginx-unprivileged:1.31-alpine AS runtime
 
 # Configuração própria (substitui a padrão da imagem).
 COPY docker/nginx/nginx.conf /etc/nginx/nginx.conf
