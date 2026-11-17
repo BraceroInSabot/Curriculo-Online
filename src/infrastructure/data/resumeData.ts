@@ -66,7 +66,7 @@ export const resumeData: RawResume = {
     avatarUrl: './foto-perfil.jpg',
     about: [
       'Sou desenvolvedor de software em Jales/SP, formado em Análise e Desenvolvimento de Sistemas pela Fatec Jales e pós-graduando em Arquitetura de Software na FIAP. Construo aplicações com Python, Django e React, sempre buscando código limpo e bem arquitetado.',
-      'Desde 2026 também atuo como professor de educação técnica na rede estadual de São Paulo. Antes da sala de aula, atendi revendedores no suporte N2 do InovaFarma, na Precisão Sistemas, e comecei na área de TI como estagiário na Prefeitura de Jales.',
+      'Desde 2026 também atuo como professor de educação técnica na rede estadual de São Paulo e atuo como desenvolvedor freelancer. Antes disso, atendi revendedores no suporte N2 do InovaFarma, na Precisão Sistemas, e comecei na área de TI como estagiário na Prefeitura de Jales.',
     ],
     // Papéis que se alternam no topo da página, depois de "sou" (o primeiro aparece ao carregar).
     roles: [' desenvolvedor', 'professor'],
@@ -86,7 +86,16 @@ export const resumeData: RawResume = {
       location: 'Jales, SP',
       period: { start: '2026-02', end: null },
       summary: 'Docência em componentes de educação técnica na rede estadual paulista.',
-      highlights: [],
+      highlights: ['Lógica de programação', 'Programação em Python', 'Redes e infraestrutura', 'Processo de Desenvolvimento de Software', 'Carreira e mercado de trabalho'],
+    },
+    {
+      id: 'desenvolvedor-freelancer',
+      role: 'Desenvolvedor Freelancer',
+      organization: 'Freestyle',
+      location: 'Jales, SP',
+      period: { start: '2026-05', end: null },
+      summary: 'Faço a elicitação de requisitos com o cliente, negocio prazo, valor e escopo. Desenvolvi um sistema capaz de gerenciar o estoque da empresa e permitir o controle de entrada e saída de produtos por um módulo de compra. Também desenvolvi a função de venda e relatórios, onde o usuário é capaz de registrar suas vendas, descontos e tipos de pagamentos.',
+      highlights: ['Python', 'Django', 'PostgreSQL', 'React', 'Docker'],
     },
     {
       id: 'precisao-sistemas',
@@ -95,7 +104,7 @@ export const resumeData: RawResume = {
       location: 'Jales, SP',
       period: { start: '2024-06', end: '2025-10' },
       summary: 'Suporte de segundo nível aos revendedores do InovaFarma, sistema de gestão para farmácias.',
-      highlights: [],
+      highlights: ['Atendimento a clientes', 'Resolução de problemas técnicos em tempo hábil', 'Documentação de processos', 'SQL Server 2016'],
     },
     {
       id: 'prefeitura-jales',
@@ -104,7 +113,7 @@ export const resumeData: RawResume = {
       location: 'Jales, SP',
       period: { start: '2023-12', end: '2024-06' },
       summary: 'Estágio na área de Tecnologia da Informação da prefeitura.',
-      highlights: [],
+      highlights: ['Atendimento a usuários internos', 'Suporte técnico', 'Manutenção de computadores e redes', 'Documentação de processos'],
     },
   ],
 
